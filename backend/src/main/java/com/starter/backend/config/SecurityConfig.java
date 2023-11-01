@@ -3,16 +3,22 @@ package com.starter.backend.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.RememberMeConfigurer;
+import org.springframework.security.config.annotation.web.headers.XssProtectionConfigDsl;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 import com.starter.backend.repository.UserRepository;
 import com.starter.backend.security.CustomUserDetailsService;
@@ -77,18 +83,25 @@ public class SecurityConfig {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http.headers(headers -> headers.xssProtection(
+                                xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                                .contentSecurityPolicy(
+                                                cps -> cps.policyDirectives("script-src 'self'")));
                 http
                                 .cors(Customizer.withDefaults())
-                                // .cors(cors -> cors.disable())
-                                .csrf(csrf -> csrf.disable())
+                                .csrf((csrf) -> csrf
+                                                .csrfTokenRepository(new CookieCsrfTokenRepository()))
                                 .sessionManagement(management -> management
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests((authz) -> authz
-                                                .requestMatchers("/auth/**", "/oauth2/**")
+                                                .requestMatchers("/auth/**", "/oauth2/**", "/doc/**")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/csrf/token").permitAll()
                                                 .anyRequest()
                                                 .authenticated());
+
                 http
                                 .oauth2Login(oauth2Login -> oauth2Login
                                                 .authorizationEndpoint(endpoint -> endpoint
@@ -103,7 +116,7 @@ public class SecurityConfig {
                                                 .failureHandler(oAuth2AuthenticationFailureHandler));
                 http
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                                                // .accessDeniedHandler(new RestAuthenticationEntryPoint())
+                                                .accessDeniedHandler(new RestAuthenticationEntryPoint())
                                                 .authenticationEntryPoint(new RestAuthenticationEntryPoint()))
 
                                 .addFilterBefore(tokenAuthenticationFilter(),

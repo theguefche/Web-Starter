@@ -1,4 +1,4 @@
-package com.starter.backend.exception;
+package com.starter.backend.exception.global;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.starter.backend.payload.DetailedExceptionResponse;
-import com.starter.backend.payload.ExceptionResponse;
+import com.starter.backend.exception.ResourceNotFoundException;
+import com.starter.backend.payload.response.DetailedExceptionResponse;
+import com.starter.backend.payload.response.ExceptionResponse;
 import com.starter.backend.service.ExceptionService;
 
 @RestControllerAdvice
@@ -53,6 +54,8 @@ public class GlobalExceptionRestHandler {
 
     // return response;
     // }
+
+    //bad request Exception
 
     @ExceptionHandler({ BadCredentialsException.class })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

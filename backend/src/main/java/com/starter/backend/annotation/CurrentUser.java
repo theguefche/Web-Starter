@@ -1,4 +1,4 @@
-package com.starter.backend.security;
+package com.starter.backend.annotation;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.lang.annotation.*;

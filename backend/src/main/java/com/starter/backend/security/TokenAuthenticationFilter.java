@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.starter.backend.security.jwt.JwtUtils;
 import com.starter.backend.util.CookieUtils;
 
 import jakarta.servlet.FilterChain;
@@ -29,37 +30,66 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private TokenProvider tokenProvider;
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtUtils jwtUtils;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        // try {
+        //     String jwt = getJwtFromRequest(request);
+
+        //     if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+        //         Long userId = tokenProvider.getUserIdFromToken(jwt);
+
+        //         UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+        //         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+        //                 userDetails, null, userDetails.getAuthorities());
+        //         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        //         SecurityContextHolder.getContext().setAuthentication(authentication);
+        //     }
+        // } catch (Exception ex) {
+        //     logger.error("Could not set user authentication in security context", ex);
+        // }
+
         try {
-            String jwt = getJwtFromRequest(request);
+            String jwt = parseJwt(request);
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                String email = jwtUtils.getEmailFromJwtToken(jwt);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                Long userId = tokenProvider.getUserIdFromToken(jwt);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } 
-        } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+            }
+        } catch (Exception e) {
+            logger.error("Cannot set user authentication: {}", e);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String parseJwt(HttpServletRequest request) {
+        String jwt = jwtUtils.getJwtFromCookies(request);
+        return jwt;
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
 
         Optional<Cookie> cookie = tokenProvider.getTokenCookie(request);
 
-        if(cookie.isPresent()) {
+        if (cookie.isPresent()) {
             return cookie.get().getValue();
         }
         return null;

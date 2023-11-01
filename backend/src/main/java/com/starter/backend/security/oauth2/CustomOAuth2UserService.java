@@ -27,16 +27,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
-
+        
+        
+        // Fix error when log in to google account and it fails due went wrong then when retry it get the e Invalid character found in the request target [/?error=[authorization_request_not_found] ]. The valid characters are defined in RFC 7230 and RFC 3986
         try {
+            OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
             return processOAuth2User(oAuth2UserRequest, oAuth2User);
-        } catch (AuthenticationException ex) {
-            throw ex;
+            // throw new Exception("[authorization_request_not_foundxczx]");
+
         } catch (Exception ex) {
+            System.out.println("asd");
             // Throwing an instance of AuthenticationException will trigger the
             // OAuth2AuthenticationFailureHandler
-            throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
+            throw new InternalAuthenticationServiceException("Something Went Wrong, Try Again !", ex.getCause());
+            // throw new OAuth2AuthenticationException("Something Went Wrong, Try Again !");
         }
     }
 
@@ -54,10 +58,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userOptional.get();
             if (!user.getProvider()
                     .equals(Provider
-                            .valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase()))) {
-                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getProvider() + " account. Please use your " + user.getProvider() +
-                        " account to login.");
+                            .valueOf(
+                                    oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase()))) {
+                throw new OAuth2AuthenticationProcessingException(
+                        "Looks like you're the email you signed up with is associated " +
+                                user.getProvider() + " account. Please use your " + user.getProvider() +
+                                " account to login.");
                 // throw new OAuth2AuthenticationProcessingException("Found " +
                 // user.getProvider() + " Account Instead !");
             }
@@ -65,8 +71,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
-
         return UserPrincipal.create(user, oAuth2User.getAttributes());
+
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {

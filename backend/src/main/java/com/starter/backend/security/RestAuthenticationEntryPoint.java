@@ -1,13 +1,18 @@
 package com.starter.backend.security;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,21 +23,39 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     private static final Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
 
     @Override
-    public void commence(HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse,
-            AuthenticationException e) throws IOException, ServletException {
-        logger.error("Responding with unauthorized error. Message - {}", e.getMessage());
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException)
+            throws IOException, ServletException {
+        logger.error("Unauthorized error: {}", authException.getMessage());
 
-        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                e.getMessage());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "Unauthorized");
+        body.put("message", authException.getMessage());
+        body.put("path", request.getServletPath());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), body);
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        logger.error("Responding with unauthorized error. Message - {}", accessDeniedException.getMessage());
+        logger.error("unauthorized error. Message - {}", accessDeniedException.getMessage());
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                accessDeniedException.getMessage());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "Unauthorized");
+        body.put("message", accessDeniedException.getMessage());
+        body.put("path", request.getServletPath());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), body);
     }
 }

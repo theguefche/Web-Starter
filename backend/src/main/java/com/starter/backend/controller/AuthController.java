@@ -1,39 +1,38 @@
 package com.starter.backend.controller;
 
-import java.net.URI;
-import java.time.LocalDateTime;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.starter.backend.annotation.CurrentUser;
 import com.starter.backend.enums.Provider;
 import com.starter.backend.exception.BadRequestException;
+import com.starter.backend.exception.TokenRefreshException;
+import com.starter.backend.model.RefreshToken;
 import com.starter.backend.model.User;
-import com.starter.backend.payload.ApiResponse;
-import com.starter.backend.payload.ExceptionResponse;
-import com.starter.backend.payload.LoginRequest;
-import com.starter.backend.payload.SignUpRequest;
+import com.starter.backend.payload.request.LoginRequest;
+import com.starter.backend.payload.request.SignUpRequest;
+import com.starter.backend.payload.response.ApiResponse;
 import com.starter.backend.repository.UserRepository;
-import com.starter.backend.security.CurrentUser;
+import com.starter.backend.security.RefreshTokenService;
 import com.starter.backend.security.TokenProvider;
+import com.starter.backend.security.UserPrincipal;
+import com.starter.backend.security.jwt.JwtUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,97 +54,101 @@ public class AuthController {
     @Autowired
     private TokenProvider tokenProvider;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,
-            HttpServletResponse response) {
+    @Autowired
+    private JwtUtils jwtUtils;
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
+    @Value("${app.auth.userIdentifier}")
+    private String userIdentifier;
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                         loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = tokenProvider.createToken(authentication);
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
 
-        tokenProvider.setAuthCookies(response, token);
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        return ResponseEntity.ok("Success !");
-    }
+        // List<String> roles = userDetails.getAuthorities().stream()
+        // .map(item -> item.getAuthority())
+        // .collect(Collectors.toList());
 
-    @GetMapping("/check")
-    public ResponseEntity<?> check(@CurrentUser HttpServletRequest request) {
-        if (tokenProvider.validateToken(tokenProvider.getTokenCookie(request).get().getValue())) {
-            return ResponseEntity.ok().body("Valid !");
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+        ResponseCookie emailCookie = ResponseCookie.from(userIdentifier, userDetails.getEmail()).path("/").maxAge(-1).build();
 
-        } else {
-            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body("Invalid !");
 
-        }
-    }
-
-    @GetMapping("/a")
-    public String heString() throws IllegalAccessException, MethodArgumentNotValidException {
-        throw new MethodArgumentNotValidException(null, null);
-    }
-
-    @PostMapping("/b")
-    public ResponseEntity<?> hadsaResponseEntity(@Valid @RequestBody LoginRequest jsoString)
-            throws JsonMappingException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        // objectMapper.readTree(jsoString);
-
-        return ResponseEntity.ok(jsoString);
-    }
-
-    @GetMapping("/c")
-    public ResponseEntity<?> tResponseEntity() {
-        ExceptionResponse x = ExceptionResponse.builder().cause("null").message("asd").trace("expired").build();
-
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(x);
-    }
-
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        String token = tokenProvider.getTokenCookie(request).get().getValue();
-        ;
-        if (token != null) {
-            tokenProvider.invalidateToken(token);
-            return ResponseEntity.ok().body("Logout Success !");
-        } else {
-            return ResponseEntity.badRequest().body("Logout Failed ! Token Unavailable");
-        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, emailCookie.toString())
+                .body(new ApiResponse("Sign In Success !"));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            // return ResponseEntity.badRequest().body("Email Already In Use !");
             throw new BadRequestException("Email address already in use.");
         }
 
-        // Creating user's account
+        // Create new user's account
         User user = User.builder()
                 .name(signUpRequest.getName())
                 .email(signUpRequest.getEmail())
-                .password(signUpRequest.getPassword())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .provider(Provider.LOCAL)
                 .emailVerified(false)
                 .build();
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
-        User result = userRepository.save(user);
+        return ResponseEntity.ok(new ApiResponse("User registered successfully!"));
+    }
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/user/me")
-                .buildAndExpand(result.getId()).toUri();
+    @PostMapping("/signout")
+    public ResponseEntity<?> logoutUser() {
+        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principle.toString() != "anonymousUser") {
+            Long userId = ((UserPrincipal) principle).getId();
+            refreshTokenService.deleteByUserId(userId);
+        }
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "User registered successfully@"));
+        ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
+        ResponseCookie jwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .body(new ApiResponse("You've been signed out!"));
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
+        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+        if ((refreshToken != null) && (refreshToken.length() > 0)) {
+            return refreshTokenService.findByToken(refreshToken)
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+
+                        return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .body(new ApiResponse("Token is refreshed successfully!"));
+                    })
+                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
+                            "Refresh token is not in database!"));
+        }
+
+        return ResponseEntity.badRequest().body(new ApiResponse("No Refresh Token Found!"));
     }
 
 }
-
-
-

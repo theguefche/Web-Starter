@@ -1,4 +1,4 @@
-package com.starter.backend.payload;
+package com.starter.backend.payload.response;
 
 import java.util.List;
 

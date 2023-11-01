@@ -18,7 +18,13 @@ public class AppProperties {
     @Data
     public static class Auth {
         private String tokenSecret;
+
+        private String jwtCookieName;
+        private String jwtRefreshCookieName;
+
         private long tokenExpirationMsec;
+        private long tokenRefreshExpirationMsec;
+        
         private String tokenName;
         private String userIdentifier;
     }

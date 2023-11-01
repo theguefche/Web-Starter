@@ -12,10 +12,6 @@ import com.starter.backend.exception.ResourceNotFoundException;
 import com.starter.backend.model.User;
 import com.starter.backend.repository.UserRepository;
 
-/**
- * Created by rajeevkumarsingh on 02/08/17.
- */
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 

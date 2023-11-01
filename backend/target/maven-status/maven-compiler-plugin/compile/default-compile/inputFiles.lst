@@ -26,6 +26,7 @@ C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starte
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\controller\UserController.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\oauth2\user\FacebookOAuth2UserInfo.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\jwt\JwtUtils.java
+C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\controller\CsrfController.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\repository\RefreshTokenRepository.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\TokenProvider.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\payload\response\DetailedExceptionResponse.java

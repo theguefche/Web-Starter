@@ -112,7 +112,8 @@ public class JwtUtils {
   private ResponseCookie generateCookie(String name, String value, String path) {
     ResponseCookie cookie;
     if (name.compareTo(jwtRefreshCookieName) == 0) {
-      cookie = ResponseCookie.from(name, value).path(path).maxAge(tokenRefreshExpirationMsec / 1000).httpOnly(true).build();
+      cookie = ResponseCookie.from(name, value).path(path).maxAge(tokenRefreshExpirationMsec / 1000).httpOnly(true)
+          .build();
     } else if (name == jwtCookieName) {
       cookie = ResponseCookie.from(name, value).path(path).maxAge(tokenExpirationMsec / 1000).httpOnly(true)
           .build();

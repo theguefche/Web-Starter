@@ -1,7 +1,5 @@
 package com.starter.backend.controller;
 
-import java.util.HashSet;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.starter.backend.annotation.CurrentUser;
+import com.starter.backend.annotation.controllers.RestApiController;
 import com.starter.backend.enums.Provider;
 import com.starter.backend.exception.BadRequestException;
 import com.starter.backend.exception.TokenRefreshException;
@@ -33,13 +30,12 @@ import com.starter.backend.security.RefreshTokenService;
 import com.starter.backend.security.TokenProvider;
 import com.starter.backend.security.UserPrincipal;
 import com.starter.backend.security.jwt.JwtUtils;
+import com.starter.backend.util.CookieUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-@RestController
-@RequestMapping("/auth")
+@RestApiController
 public class AuthController {
 
     @Autowired
@@ -63,7 +59,7 @@ public class AuthController {
     @Value("${app.auth.userIdentifier}")
     private String userIdentifier;
 
-    @PostMapping("/signin")
+    @PostMapping("/auth/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager
@@ -82,8 +78,8 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
-        ResponseCookie emailCookie = ResponseCookie.from(userIdentifier, userDetails.getEmail()).path("/").maxAge(-1).build();
-
+        ResponseCookie emailCookie = ResponseCookie.from(userIdentifier, userDetails.getEmail()).path("/").maxAge(-1)
+                .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -92,7 +88,7 @@ public class AuthController {
                 .body(new ApiResponse("Sign In Success !"));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -113,7 +109,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse("User registered successfully!"));
     }
 
-    @PostMapping("/signout")
+    @PostMapping("/auth/signout")
     public ResponseEntity<?> logoutUser() {
         Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principle.toString() != "anonymousUser") {
@@ -130,7 +126,7 @@ public class AuthController {
                 .body(new ApiResponse("You've been signed out!"));
     }
 
-    @PostMapping("/refreshtoken")
+    @PostMapping("/auth/refreshtoken")
     public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
         String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
         if ((refreshToken != null) && (refreshToken.length() > 0)) {
@@ -149,6 +145,22 @@ public class AuthController {
         }
 
         return ResponseEntity.badRequest().body(new ApiResponse("No Refresh Token Found!"));
+    }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<?> check(@CurrentUser HttpServletRequest request) {
+        User u = userRepository.findByEmail(CookieUtils.getCookie(request, userIdentifier).get().getValue())
+                .orElse(null);
+        RefreshToken token = refreshTokenService.findByUser(u).orElse(null);
+        if (token != null) {
+            if (refreshTokenService.isRefreshTokenExpired(token) == false) {
+                return ResponseEntity.ok().body(new ApiResponse("Valid !"));
+            } else {
+                return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ApiResponse("Invalid !"));
+            }
+        } else
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ApiResponse("No Authentication !"));
+
     }
 
 }

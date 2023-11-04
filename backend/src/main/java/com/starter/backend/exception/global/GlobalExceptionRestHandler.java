@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
@@ -14,15 +13,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.starter.backend.annotation.controllers_advice.RestApiControllerAdvice;
 import com.starter.backend.exception.ResourceNotFoundException;
 import com.starter.backend.payload.response.DetailedExceptionResponse;
 import com.starter.backend.payload.response.ExceptionResponse;
 import com.starter.backend.service.ExceptionService;
 
-@RestControllerAdvice
+@RestApiControllerAdvice
 public class GlobalExceptionRestHandler {
 
     @Autowired
@@ -55,7 +54,7 @@ public class GlobalExceptionRestHandler {
     // return response;
     // }
 
-    //bad request Exception
+    // bad request Exception
 
     @ExceptionHandler({ BadCredentialsException.class })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -71,18 +70,17 @@ public class GlobalExceptionRestHandler {
 
     }
 
-    // @ExceptionHandler({ Exception.class })
-    // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    // public ExceptionResponse handleUnexpectedErrors(Exception exception) {
+    @ExceptionHandler({ Exception.class })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleUnexpectedErrors(Exception exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .cause(exception.getMessage())
+                .message(exception.getClass().getName())
+                .trace(service.retreiveDebugTrace(exception.getStackTrace()))
+                .build();
 
-    // ExceptionResponse response = ExceptionResponse.builder()
-    // .cause(exception.getMessage())
-    // .message(exception.getClass().getName())
-    // .trace(service.retreiveDebugTrace(exception.getStackTrace()))
-    // .build();
-
-    // return response;
-    // }
+        return response;
+    }
 
     @ExceptionHandler({ JsonParseException.class, HttpMessageNotReadableException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)

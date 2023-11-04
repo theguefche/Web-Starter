@@ -12,7 +12,12 @@ public class ExceptionService {
         for (int i = 0; i < stackTrace.length; i++) {
             StackTraceElement element = stackTrace[i];
             if (element.getClassName().startsWith(packageName)) {
-                debugTrace += stackTrace[i - 1].toString() + " | ";
+                try { // in case there is a trace before
+                    debugTrace += stackTrace[i - 1].toString() + " | ";
+                } catch (Exception e) {
+                    
+                }
+                debugTrace += stackTrace[i].toString() + " | ";
                 debugTrace += element.toString();
                 break;
             }

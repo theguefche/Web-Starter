@@ -1,6 +1,5 @@
 package com.starter.backend.security;
 
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +15,8 @@ import com.starter.backend.model.User;
 import com.starter.backend.repository.RefreshTokenRepository;
 import com.starter.backend.repository.UserRepository;
 
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 @Service
 public class RefreshTokenService {
@@ -33,24 +33,30 @@ public class RefreshTokenService {
     return refreshTokenRepository.findByToken(token);
   }
 
-  public RefreshToken createRefreshToken(Long userId) {
+    public Optional<RefreshToken> findByUser(User user) {
+    return refreshTokenRepository.findByUser(user);
+  }
 
+  public RefreshToken createRefreshToken(Long userId) {
     User user = userRepository.findById(userId).get();
     RefreshToken refreshToken = refreshTokenRepository.findByUser(user).orElse(new RefreshToken(user));
-
-    System.out.println("refresh token XX " + tokenRefreshExpirationMsec);
     refreshToken.setExpiryDate(Instant.now().plusMillis(tokenRefreshExpirationMsec));
-    System.out.println(refreshToken.getExpiryDate().toEpochMilli());
-
     refreshToken.setToken(UUID.randomUUID().toString());
-
     refreshToken = refreshTokenRepository.save(refreshToken);
 
     return refreshToken;
   }
 
+  public boolean isRefreshTokenExpired(RefreshToken token) {
+    if (token.getExpiryDate().compareTo(Instant.now()) < 0)
+      return true;
+    else
+      return false;
+
+  }
+
   public RefreshToken verifyExpiration(RefreshToken token) {
-    if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+    if (isRefreshTokenExpired(token)) {
       refreshTokenRepository.delete(token);
       throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
     }
@@ -62,4 +68,5 @@ public class RefreshTokenService {
   public int deleteByUserId(Long userId) {
     return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
   }
+
 }

@@ -6,13 +6,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.starter.backend.annotation.CurrentUser;
+import com.starter.backend.annotation.controllers.RestApiController;
 import com.starter.backend.exception.ResourceNotFoundException;
 import com.starter.backend.model.User;
 import com.starter.backend.repository.UserRepository;
 import com.starter.backend.security.UserPrincipal;
 
-@RestController
+@RestApiController
 public class UserController {
+
 
     @Autowired
     private UserRepository userRepository;
@@ -29,7 +31,7 @@ public class UserController {
         return "hi!";
     }
 
-    @PostMapping("/user")
+    @PostMapping("/user/user")
     public String testCSRF() {
         return "Csrf Protection grants Access";
     }

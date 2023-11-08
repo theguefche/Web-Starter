@@ -1,6 +1,5 @@
 package com.starter.backend.security;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,10 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
+        System.out.println("executing load by username");
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with email : " + email)
-        );
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
 
         return UserPrincipal.create(user);
     }
@@ -33,8 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException("User", "id", id)
-        );
+                () -> new ResourceNotFoundException("User", "id", id));
 
         return UserPrincipal.create(user);
     }

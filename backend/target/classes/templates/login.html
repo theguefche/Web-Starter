@@ -3,50 +3,71 @@
 
 <head>
 	<title>Login</title>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
-		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<script th:src="@{/tailwind.js}"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<!-- <link th:href="@{/bootstrap.css}" rel="stylesheet" crossorigin="anonymous"> -->
 </head>
 
 <body>
-	<!--<h1>Login</h1>-->
-	<!--<p th:if="${param.error}" class="error">Wrong email or password</p>-->
-	<!--<form th:action="@{/login}" method="post">-->
-	<!--  <label for="email">Email</label>:-->
-	<!--  <input type="text" id="email" name="username" autofocus="autofocus" /> <br />-->
-	<!--  <label for="password">Password</label>:-->
-	<!--  <input type="password" id="password" name="password" /> <br />-->
-	<!--  <input type="submit" value="Log in" />-->
-	<!--</form>-->
-	<!--</body>-->
-	<!--</html>-->
 
+	<!-- <form th:action="@{/doc/login}" method="post" style="width: 500px; margin: 150px auto; ">
+		<h3 class="text-center bg-red-100 ">Login</h3>
+		<div th:if="${param.error}" class="alert alert-danger text-center" role="alert">Access
+			Denied</div>
 
-	<form th:action="@{/doc/login}" method="post" style="width: 500px; margin: 150px auto; ">
-		<h3 class="text-center">Login</h3>
-		<div th:if="${param.error}" class="alert alert-danger text-center" role="alert">Wrong email or password</div>
-		<div th:if="${param.pass}" class="alert alert-success text-center" role="alert">Пароль успешно изменен</div>
-		<div th:if="${param.email}" class="alert alert-success text-center" role="alert">Сообщение успешно отправлено на
-			указанный email</div>
-		<div th:if="${param.token}" class="alert alert-danger text-center" role="alert">Не валидный токен</div>
-
-		<!-- Email input -->
 		<div class="form-outline mb-4">
 			<label class="form-label" for="form2Example1">Username</label>
-			<input type="text" name="username" id="form2Example1" class="form-control" />
+			<input type="text" name="username" id="form2Example1" autofocus="autofocus" class="form-control" />
 		</div>
 
-		<!-- Password input -->
 		<div class="form-outline mb-4">
 			<label class="form-label" for="form2Example2">Password</label>
 			<input type="password" name="password" id="form2Example2" class="form-control" />
 		</div>
 
 
-		<!-- Submit button -->
-		<button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+		<button type="submit" class="btn btn-bleu center btn-block mb-4">Sign in</button>
 
-	</form>
+	</form> -->
+	<section class="bg-gray-50 ">
+		<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 space-y-4">
+			<div th:if="${param.error}" class="flex items-center p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 "
+				role="alert">
+				<svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+					fill="currentColor" viewBox="0 0 20 20">
+					<path
+						d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+				</svg>
+				<span class="sr-only">Info</span>
+				<div>
+					<span class="font-medium">Danger alert!</span> Change a few things up and try submitting again.
+				</div>
+			</div>
+			<div class="w-full bg-white rounded-lg shadow-xl  md:mt-0 sm:max-w-md xl:p-0  space-y-6 ">
+				<div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+					<h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+						Sign In
+					</h1>
+					<form class="space-y-4 md:space-y-6" th:action="@{/doc/login}" method="post">
+						<div>
+							<input type="text" name="username" id="email"
+								class="bg-bleu-400 border border-bleu-600 text-gray-900 sm:text-sm rounded-lg focus:ring-bleu-600 focus:border-sky-600 block w-full p-2.5"
+								placeholder="Username" required="">
+						</div>
+						<div>
+							<input type="password" name="password" id="password" placeholder="••••••••" minlength="8"
+								class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-bleu-600 focus:border-bleu-600 block w-full p-2.5"
+								required="">
+						</div>
+						<button type="submit"
+							class="w-full text-white bg-blue-500 hover:bg-blue-800 hover:ring-4 hover:ring-offset-2 transition-all duration-300 focus:scale(.75) focus:ring-4 focus:outline-none focus:ring-bleu-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign
+							in</button>
 
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
 </body>
 
 </html>

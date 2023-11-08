@@ -16,12 +16,14 @@ C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starte
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\config\CacheConfig.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\annotation\controllers\RestApiController.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\BackendApplication.java
+C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\doc\DocSuccessHandler.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\TokenProvider.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\oauth2\HttpCookieOAuth2AuthorizationRequestRepository.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\model\RefreshToken.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\RestAuthenticationEntryPoint.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\service\ExceptionService.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\model\User.java
+C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\config\DocConfig.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\exception\TokenRefreshException.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\payload\request\LoginRequest.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\oauth2\OAuth2AuthenticationSuccessHandler.java
@@ -38,8 +40,10 @@ C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starte
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\controller\CsrfController.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\annotation\controllers_advice\RestApiControllerAdvice.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\repository\RefreshTokenRepository.java
+C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\annotation\docs\HideParam.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\payload\response\DetailedExceptionResponse.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\enums\Provider.java
+C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\doc\DocFilter.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\oauth2\CustomOAuth2UserService.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\repository\UserRepository.java
 C:\Users\lilou\Bureau\Web Templates\Web Starter\backend\src\main\java\com\starter\backend\security\oauth2\user\GoogleOAuth2UserInfo.java

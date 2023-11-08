@@ -3,22 +3,19 @@ package com.starter.backend.security;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.security.auth.login.LoginException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.starter.backend.security.jwt.JwtUtils;
-import com.starter.backend.util.CookieUtils;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,17 +36,25 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
+    private final RequestMatcher uriMatcher = new AntPathRequestMatcher("/api/**");
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        RequestMatcher matcher = new NegatedRequestMatcher(uriMatcher);
+        return matcher.matches(request);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
+        System.out.println("TokenAuth Filter ");
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String email = jwtUtils.getEmailFromJwtToken(jwt);
-
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+
+                System.out.println(userDetails.getAuthorities().toArray().toString());
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails,

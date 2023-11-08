@@ -1,6 +1,4 @@
 package com.starter.backend.model;
-import javax.management.relation.Role;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starter.backend.enums.Provider;
 

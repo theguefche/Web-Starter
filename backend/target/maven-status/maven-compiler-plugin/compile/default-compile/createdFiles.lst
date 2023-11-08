@@ -1,6 +1,7 @@
 com\starter\backend\security\oauth2\user\OAuth2UserInfoFactory.class
 com\starter\backend\config\AppProperties$Auth.class
 com\starter\backend\model\User$UserBuilder.class
+com\starter\backend\security\doc\DocSuccessHandler.class
 com\starter\backend\security\oauth2\CustomOAuth2UserService.class
 com\starter\backend\security\oauth2\user\FacebookOAuth2UserInfo.class
 com\starter\backend\security\oauth2\user\GoogleOAuth2UserInfo.class
@@ -9,6 +10,7 @@ com\starter\backend\exception\OAuth2AuthenticationProcessingException.class
 com\starter\backend\exception\global\GlobalExceptionRestHandler.class
 com\starter\backend\BackendApplication.class
 com\starter\backend\payload\response\DetailedExceptionResponse.class
+com\starter\backend\config\DocConfig.class
 com\starter\backend\security\UserPrincipal.class
 com\starter\backend\config\CacheEvictor.class
 com\starter\backend\controller\CsrfController.class
@@ -41,6 +43,7 @@ com\starter\backend\security\TokenProvider.class
 com\starter\backend\model\RefreshToken.class
 com\starter\backend\enums\Provider.class
 com\starter\backend\exception\TokenRefreshException.class
+com\starter\backend\annotation\docs\HideParam.class
 com\starter\backend\exception\BadRequestException.class
 com\starter\backend\payload\response\AuthResponse.class
 com\starter\backend\controller\AuthController.class
@@ -57,3 +60,4 @@ com\starter\backend\config\WebMvcConfig.class
 com\starter\backend\config\AppProperties.class
 com\starter\backend\security\oauth2\HttpCookieOAuth2AuthorizationRequestRepository.class
 com\starter\backend\payload\response\ExceptionResponse$ExceptionResponseBuilder.class
+com\starter\backend\security\doc\DocFilter.class

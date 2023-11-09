@@ -16,6 +16,7 @@ public class SignUpRequest {
     private String email;
 
     @NotBlank
+    // @Size(min = 8 , max = 256)
     private String password;
 
     public String getName() {

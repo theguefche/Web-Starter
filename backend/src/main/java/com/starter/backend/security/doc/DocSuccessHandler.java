@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -38,6 +39,9 @@ public class DocSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
+    @Value("${app.docs.roleCheck}")
+        private String docs_role;
+        
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
             HttpServletResponse response, Authentication authentication)
@@ -50,8 +54,7 @@ public class DocSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             for (String string : roles) {
                 logger.info(string);
             }
-            if (roles.contains("ROLE_DEVELOPPER")) {
-                logger.error("User has role: dev");
+            if (roles.contains(docs_role)) {
                 getRedirectStrategy().sendRedirect(request, response, "/doc/api-docs-ui");
                 return;
             }

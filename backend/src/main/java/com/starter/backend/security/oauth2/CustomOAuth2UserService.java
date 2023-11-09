@@ -36,7 +36,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // throw new Exception("[authorization_request_not_foundxczx]");
 
         } catch (Exception ex) {
-            System.out.println("asd");
             // Throwing an instance of AuthenticationException will trigger the
             // OAuth2AuthenticationFailureHandler
             throw new InternalAuthenticationServiceException("Something Went Wrong, Try Again !", ex.getCause());

@@ -13,6 +13,7 @@ import lombok.Data;
 @Data
 public class AppProperties {
     private final Auth auth = new Auth();
+    private final Docs docs = new Docs();
     private final OAuth2 oauth2 = new OAuth2();
 
     @Data
@@ -24,9 +25,18 @@ public class AppProperties {
 
         private long tokenExpirationMsec;
         private long tokenRefreshExpirationMsec;
-        
+
         private String tokenName;
         private String userIdentifier;
+    }
+
+    @Data
+    public static class Docs {
+        private String username;
+        private String password;
+        private String role;
+        private String roleCheck;
+
     }
 
     public static final class OAuth2 {
@@ -48,5 +58,9 @@ public class AppProperties {
 
     public OAuth2 getOauth2() {
         return oauth2;
+    }
+
+    public Docs getDocs() {
+        return docs;
     }
 }

@@ -3,6 +3,7 @@ package com.starter.backend.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -44,6 +45,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+        @Value("${app.docs.username}")
+        private String docs_username;
+
+        @Value("${app.docs.password}")
+        private String docs_password;
+
+        @Value("${app.docs.role}")
+        private String docs_role;
+
+   
         @Resource
         private CustomUserDetailsService customUserDetailsService;
 
@@ -157,7 +168,7 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests((authz) -> authz
                                                 .requestMatchers(API_PATH + "/**")
-                                                .hasRole("DEVELOPPER")
+                                                .hasRole(docs_role)
                                                 .requestMatchers("/resources/**").permitAll()
                                                 .anyRequest().authenticated())
                                 .authenticationProvider(inMemoryAuthenticationProvider())
@@ -184,9 +195,9 @@ public class SecurityConfig {
         public AuthenticationProvider inMemoryAuthenticationProvider() {
                 InMemoryUserDetailsManager userDetailsManager = new InMemoryUserDetailsManager();
                 userDetailsManager.createUser(User.builder()
-                                .username("user2")
-                                .password("{bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG")
-                                .roles("DEVELOPPER")
+                                .username(docs_username)
+                                .password(docs_password)
+                                .roles(docs_role)
                                 .build());
 
                 DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

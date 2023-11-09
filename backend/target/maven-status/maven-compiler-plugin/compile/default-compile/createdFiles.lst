@@ -11,6 +11,7 @@ com\starter\backend\exception\global\GlobalExceptionRestHandler.class
 com\starter\backend\BackendApplication.class
 com\starter\backend\payload\response\DetailedExceptionResponse.class
 com\starter\backend\config\DocConfig.class
+com\starter\backend\config\AppProperties$Docs.class
 com\starter\backend\security\UserPrincipal.class
 com\starter\backend\config\CacheEvictor.class
 com\starter\backend\controller\CsrfController.class

@@ -110,7 +110,7 @@ public class SecurityConfig {
                                                 UsernamePasswordAuthenticationFilter.class)
 
                                 .authorizeHttpRequests((authz) -> authz
-                                                .requestMatchers(API_PATH + "/auth/**", API_PATH + "/oauth2/**")
+                                                .requestMatchers(API_PATH + "/auth/**", API_PATH + "/oauth2/**", API_PATH+"/v/**")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.POST, API_PATH + "/user").permitAll()
                                                 .requestMatchers(HttpMethod.GET, API_PATH + "/csrf/**").permitAll()

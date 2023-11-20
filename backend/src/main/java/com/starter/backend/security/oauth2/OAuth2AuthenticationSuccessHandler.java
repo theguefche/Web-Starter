@@ -45,7 +45,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Autowired
     private RefreshTokenService refreshTokenService;
 
-
     @Autowired
     OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider, AppProperties appProperties,
             HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
@@ -88,19 +87,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
-        ResponseCookie emailCookie = ResponseCookie.from(appProperties.getAuth().getUserIdentifier(), userDetails.getEmail()).path("/").maxAge(-1).build();
+        ResponseCookie emailCookie = ResponseCookie
+                .from(appProperties.getAuth().getUserIdentifier(), userDetails.getEmail()).path("/").secure(appProperties.getAuth().isSecured_deploy()).maxAge(-1).build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, emailCookie.toString());
 
+        // add parameter to determine of ot's mobile to send string instead of cookies
+
+        logger.info(targetUrl);
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .build().toUriString();
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
-        // httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+        // httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request,
+        // response);
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {

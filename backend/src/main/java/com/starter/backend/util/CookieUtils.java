@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.SerializationUtils;
 
@@ -16,6 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class CookieUtils {
+
+    
+    @Value(value = "app.auth.secured_deploy")
+    private static boolean secured_dep ;
     
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
@@ -35,6 +40,7 @@ public class CookieUtils {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setSecure(secured_dep);
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
     }

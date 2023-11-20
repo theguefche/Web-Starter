@@ -18,6 +18,8 @@ public class AppProperties {
 
     @Data
     public static class Auth {
+
+        private boolean secured_deploy ;
         private String tokenSecret;
 
         private String jwtCookieName;

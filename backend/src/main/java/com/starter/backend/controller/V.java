@@ -32,7 +32,7 @@ public class V {
 
       @GetMapping("/v/not-secure-cookies")
     public ResponseEntity<?> y(HttpServletResponse response) {
-        ResponseCookie c =    ResponseCookie.from("not-secure", "not-secured").path("/").maxAge(-1).secure(true).build();
+        ResponseCookie c =    ResponseCookie.from("not-secure", "not-secured").path("/").maxAge(-1).secure(false).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE ,c.toString() ).body("done");
 
     }

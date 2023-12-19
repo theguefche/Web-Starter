@@ -97,7 +97,7 @@ public class AuthController {
 
         // Create new user's account
         User user = User.builder()
-                .name(signUpRequest.getName())
+                .fullName(signUpRequest.getFullName())
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .provider(Provider.LOCAL)

@@ -3,13 +3,9 @@ package com.starter.backend.payload.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * Created by rajeevkumarsingh on 02/08/17.
- */
-
 public class SignUpRequest {
     @NotBlank
-    private String name;
+    private String fullName;
 
     @NotBlank
     @Email
@@ -19,12 +15,12 @@ public class SignUpRequest {
     // @Size(min = 8 , max = 256)
     private String password;
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullname) {
+        this.fullName = fullname;
     }
 
     public String getEmail() {

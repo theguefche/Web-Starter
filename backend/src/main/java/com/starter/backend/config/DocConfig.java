@@ -52,8 +52,6 @@ public class DocConfig {
 						.title("WebStarter BACKEND")
 						.description("This A backend template made for my future jobs and tasks")
 						.contact(new Contact().email("alaa.leguefche@gmail.com"))
-						.termsOfService("asdasdasd asdasd asd as dasd")
-						.license(new License().name("").url(""))
 						.version("0.0.1"));
 	}
 

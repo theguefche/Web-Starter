@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -13,6 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.starter.backend.payload.response.ExceptionResponse;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,14 +33,16 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint, A
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .cause(authException.getMessage())
+                .message("Something Went Wrong ! Try Again !")
+                .path(request.getServletPath())
+                .trace("none")
+                .build();
 
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+        mapper.writeValue(response.getOutputStream(), exceptionResponse);
     }
 
     @Override
@@ -49,13 +53,15 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint, A
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", accessDeniedException.getMessage());
-        body.put("path", request.getServletPath());
+        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .cause(accessDeniedException.getMessage())
+                .message("Something Went Wrong ! Try Again !")
+                .path(request.getServletPath())
+                .trace("none")
+                .build();
 
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+        mapper.writeValue(response.getOutputStream(), exceptionResponse);
     }
 }

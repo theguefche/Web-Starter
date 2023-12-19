@@ -1,7 +1,5 @@
 package com.starter.backend.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -104,8 +100,6 @@ public class SecurityConfig {
 
                 http
                                 .securityMatcher(API_PATH + "/**")
-                                // .authenticationProvider(inMemoryAuthenticationProviderFirst())
-                                // .userDetailsService(customUserDetailsService)
                                 .addFilterBefore(tokenAuthenticationFilter(),
                                                 UsernamePasswordAuthenticationFilter.class)
 
@@ -125,7 +119,6 @@ public class SecurityConfig {
                                 .cors(Customizer.withDefaults())
                                 .csrf((csrf) -> csrf
                                                 .csrfTokenRepository(new CookieCsrfTokenRepository()))
-                                // .csrf().disable()
                                 .sessionManagement(management -> management
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

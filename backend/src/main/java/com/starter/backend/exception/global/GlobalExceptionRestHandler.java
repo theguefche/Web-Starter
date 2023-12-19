@@ -21,6 +21,8 @@ import com.starter.backend.payload.response.DetailedExceptionResponse;
 import com.starter.backend.payload.response.ExceptionResponse;
 import com.starter.backend.service.ExceptionService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestApiControllerAdvice
 public class GlobalExceptionRestHandler {
 
@@ -29,9 +31,12 @@ public class GlobalExceptionRestHandler {
 
     @ExceptionHandler({ ResourceNotFoundException.class })
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionResponse handleNotFound(ResourceNotFoundException exception) {
+    public ExceptionResponse handleNotFound(ResourceNotFoundException exception, HttpServletRequest request) {
+        String path = request.getServletPath();
 
         ExceptionResponse response = ExceptionResponse.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .path(path)
                 .cause(exception.getStackTrace()[0].toString())
                 .message(exception.getMessage())
                 .trace(service.retreiveDebugTrace(exception.getStackTrace()))
@@ -58,9 +63,12 @@ public class GlobalExceptionRestHandler {
 
     @ExceptionHandler({ BadCredentialsException.class })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ExceptionResponse handleWrongCredatials(BadCredentialsException exception) {
+    public ExceptionResponse handleWrongCredatials(BadCredentialsException exception, HttpServletRequest request) {
+        String path = request.getServletPath();
 
         ExceptionResponse response = ExceptionResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .path(path)
                 .cause("Unable To Find Account")
                 .message("Wrong email/password !")
                 .trace(service.retreiveDebugTrace(exception.getStackTrace()))
@@ -72,8 +80,12 @@ public class GlobalExceptionRestHandler {
 
     @ExceptionHandler({ Exception.class })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleUnexpectedErrors(Exception exception) {
+    public ExceptionResponse handleUnexpectedErrors(Exception exception, HttpServletRequest request) {
+        String path = request.getServletPath();
+
         ExceptionResponse response = ExceptionResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .path(path)
                 .cause(exception.getMessage())
                 .message(exception.getClass().getName())
                 .trace(service.retreiveDebugTrace(exception.getStackTrace()))
@@ -97,10 +109,12 @@ public class GlobalExceptionRestHandler {
 
     @ExceptionHandler({ MethodArgumentNotValidException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleObjectConversion(MethodArgumentNotValidException exception) {
+    public ExceptionResponse handleObjectConversion(MethodArgumentNotValidException exception , HttpServletRequest request) {
 
         BindingResult bindingResult = exception.getBindingResult();
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+        String path = request.getServletPath(); 
+
 
         List<String> errorMessages = new ArrayList<>();
         for (FieldError fieldError : fieldErrors) {
@@ -110,6 +124,8 @@ public class GlobalExceptionRestHandler {
         }
 
         DetailedExceptionResponse response = DetailedExceptionResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .path(path)
                 .cause("Cannot Convert RequestBody To " + exception.getObjectName() + " : Invalid Object")
                 .message("Invalid Information !")
                 .trace(service.retreiveDebugTrace(exception.getStackTrace()))
